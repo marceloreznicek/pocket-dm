@@ -44,14 +44,14 @@ const campaigns = [
 
 const CampaignSelector: FC = () => {
   return (
-    <div className="min-h-screen bg-mystic-950 py-12">
+    <div className="min-h-screen bg-green-50 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-white mb-4 font-display">
+          <h1 className="text-4xl font-bold text-green-900 mb-4 font-display">
             Choose Your Adventure
           </h1>
-          <p className="text-lg text-mystic-200">
+          <p className="text-lg text-green-700">
             Select a campaign to begin your journey
           </p>
         </div>
@@ -62,41 +62,35 @@ const CampaignSelector: FC = () => {
             <Link 
               href={`/campaign/${campaign.id}`} 
               key={campaign.id}
-              className="bg-mystic-800/50 rounded-xl overflow-hidden border border-gold-700/30 hover:border-gold-500/50 transition-all duration-300 group"
+              className="bg-white shadow-lg rounded-xl overflow-hidden border border-green-300 hover:border-green-500 transition-all duration-300 group"
             >
               <div className="relative">
-                {/* Placeholder image */}
-                {/* <img
-                  src=""
-                  alt={campaign.title}
-                  className="w-full h-48 object-cover"
-                /> */}
                 {/* Difficulty badge */}
-                <div className="absolute top-4 right-4 bg-mystic-900/90 px-3 py-1 rounded-full border border-gold-500/30">
-                  <span className="text-sm text-mystic-200">{campaign.difficulty}</span>
+                <div className="absolute top-4 right-4 bg-green-200 px-3 py-1 rounded-full border border-green-400">
+                  <span className="text-sm text-green-900">{campaign.difficulty}</span>
                 </div>
               </div>
 
               <div className="p-6">
-                <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-gold-400 transition-colors duration-300">
+                <h3 className="text-2xl font-bold text-green-900 mb-2 group-hover:text-green-600 transition-colors duration-300">
                   {campaign.title}
                 </h3>
-                <p className="text-mystic-200 mb-4">
+                <p className="text-green-700 mb-4">
                   {campaign.description}
                 </p>
 
                 {/* Campaign stats */}
-                <div className="grid grid-cols-3 gap-4 text-sm text-mystic-300">
+                <div className="grid grid-cols-3 gap-4 text-sm text-green-800">
                   <div className="flex items-center">
-                    <Users className="w-4 h-4 mr-2 text-gold-500" />
+                    <Users className="w-4 h-4 mr-2 text-green-600" />
                     <span>{campaign.playerCount} players</span>
                   </div>
                   <div className="flex items-center">
-                    <Clock className="w-4 h-4 mr-2 text-gold-500" />
+                    <Clock className="w-4 h-4 mr-2 text-green-600" />
                     <span>{campaign.duration}</span>
                   </div>
                   <div className="flex items-center">
-                    <MapPin className="w-4 h-4 mr-2 text-gold-500" />
+                    <MapPin className="w-4 h-4 mr-2 text-green-600" />
                     <span>{campaign.setting}</span>
                   </div>
                 </div>
@@ -107,7 +101,7 @@ const CampaignSelector: FC = () => {
 
         {/* Optional: Add Campaign Button */}
         <div className="text-center mt-12">
-          <button className="px-6 py-3 bg-mystic-600 text-white rounded-lg hover:bg-mystic-500 transition border border-gold-500 font-semibold">
+          <button className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-500 transition border border-green-700 font-semibold">
             Create New Campaign
           </button>
         </div>
