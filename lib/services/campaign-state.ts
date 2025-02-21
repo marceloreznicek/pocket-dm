@@ -1,6 +1,10 @@
 import pool from '../db';
 
+
+
 export const CampaignStateService = {
+
+
   async upsert(state: {
     campaign_id: string,
     current_scene?: string,
@@ -21,7 +25,7 @@ export const CampaignStateService = {
         updated_at = CURRENT_TIMESTAMP
       RETURNING *
     `;
-    
+
     return pool.query(query, [
       state.campaign_id,
       state.current_scene,

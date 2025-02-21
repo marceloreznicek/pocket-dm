@@ -1,43 +1,29 @@
-"use client"
+'use client';
 
-import { FC, useState, useRef, useEffect } from 'react';
+import { FC, useState, useRef, useEffect, use } from 'react';
 import { Send, User, Dice6 } from 'lucide-react';
 
-// Types
-interface ChatMessage {
-  id: number;
+interface Message {
+  id: string;
   content: string;
-  role: 'assistant' | 'user';
-  metadata: {
-    sender: 'dm' | 'player';
-    characterName?: string;
-    timestamp: Date;
-  };
+  sender_id: string;
+  message_type: string;
+  metadata?: any;
+  created_at: Date;
+  username?: string;
 }
 
-interface ChatProps {
-  initialMessage?: string;
-  playerName?: string;
-  campaignName?: string;
+interface CampaignPageProps {
+  params: Promise<{
+    id: string;
+  }>
 }
 
-const DEFAULT_INITIAL_MESSAGE = "Welcome adventurer. What would you like to do?";
-
-export const ChatInterface: FC<ChatProps> = ({
-  initialMessage = DEFAULT_INITIAL_MESSAGE,
-  playerName = "Adventurer",
-  campaignName = "New Campaign"
-}) => {
+const CampaignPage: FC<CampaignPageProps> = ({ params }) => {
+  const { id: campaignId } = use(params);
+  
   // State
-  const [messages, setMessages] = useState<ChatMessage[]>(() => [{
-    id: 1,
-    content: initialMessage,
-    role: 'assistant',
-    metadata: {
-      sender: 'dm',
-      timestamp: new Date()
-    }
-  }]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   
@@ -45,6 +31,10 @@ export const ChatInterface: FC<ChatProps> = ({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
   // Effects
+  useEffect(() => {
+    fetchMessages();
+  }, []);
+
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
@@ -54,99 +44,54 @@ export const ChatInterface: FC<ChatProps> = ({
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const createMessage = (
-    content: string,
-    role: 'assistant' | 'user',
-    sender: 'dm' | 'player'
-  ): ChatMessage => ({
-    id: Date.now(),
-    content,
-    role,
-    metadata: {
-      sender,
-      characterName: sender === 'player' ? playerName : undefined,
-      timestamp: new Date()
+  const fetchMessages = async () => {
+    try {
+      const response = await fetch(`/api/campaigns/${campaignId}/messages`);
+      if (!response.ok) throw new Error('Failed to fetch messages');
+      const data = await response.json();
+      setMessages(data);
+    } catch (error) {
+      console.error('Error fetching messages:', error);
     }
-  });
+  };
 
   // Handlers
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputMessage.trim() || isLoading) return;
 
-    // Create and add player message
-    const playerMessage = createMessage(inputMessage, 'user', 'player');
-    setMessages(prev => [...prev, playerMessage]);
-    setInputMessage('');
     setIsLoading(true);
-
     try {
-      // Send to API
-      const response = await fetch('/api/openai', {
+      const response = await fetch(`/api/campaigns/${campaignId}/messages`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          messages: [...messages, playerMessage].map(msg => ({
-            role: msg.role,
-            content: msg.content
-          }))
+          content: inputMessage,
+          sender_id: 'test-user-id', // This should come from auth
         }),
       });
 
-      if (!response.ok) throw new Error('Failed to get response');
+      if (!response.ok) throw new Error('Failed to send message');
 
-      const aiResponse = await response.json();
-      const dmMessage = createMessage(aiResponse.content, 'assistant', 'dm');
-      setMessages(prev => [...prev, dmMessage]);
+      const newMessage = await response.json();
+      setMessages(prev => [...prev, newMessage]);
+      setInputMessage('');
     } catch (error) {
       console.error('Error:', error);
-      // You might want to show an error message to the user here
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Message Component
-  const MessageBubble: FC<{ message: ChatMessage }> = ({ message }) => {
-    const isPlayer = message.metadata.sender === 'player';
-    
-    return (
-      <div className={`flex ${isPlayer ? 'justify-end' : 'justify-start'}`}>
-        <div
-          className={`max-w-[80%] rounded-lg p-4 ${
-            isPlayer
-              ? 'bg-mystic-700 text-white'
-              : 'bg-mystic-800 border border-gold-700/30'
-          }`}
-        >
-          <div className="flex items-center space-x-2 mb-2">
-            {isPlayer ? (
-              <>
-                <User className="w-4 h-4 text-mystic-200" />
-                <span className="text-mystic-200 text-sm">{message.metadata.characterName}</span>
-              </>
-            ) : (
-              <>
-                <Dice6 className="w-4 h-4 text-gold-500" />
-                <span className="text-gold-500 text-sm">Dungeon Master</span>
-              </>
-            )}
-          </div>
-          <p className="text-mystic-100">{message.content}</p>
-        </div>
-      </div>
-    );
-  };
-
   return (
-    <div className="min-h-screen bg-mystic-950 flex flex-col">
+    <div className="h-screen bg-mystic-950 flex flex-col">
       {/* Header */}
-      <div className="bg-mystic-900 border-b border-gold-700/30 p-4">
+      <div className="bg-mystic-900 border-b border-gold-700/30 p-4 fixed top-0 left-0 right-0 z-10">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <h1 className="text-xl font-display text-white">{campaignName}</h1>
+          <h1 className="text-xl font-display text-white">A Wild Sheep Chase</h1>
           <div className="flex items-center space-x-2 text-mystic-200">
             <User className="w-4 h-4" />
-            <span>Playing as {playerName}</span>
+            <span>Playing as Test Player</span>
           </div>
         </div>
       </div>
@@ -197,4 +142,4 @@ export const ChatInterface: FC<ChatProps> = ({
   );
 };
 
-export default ChatInterface;
+export default CampaignPage;

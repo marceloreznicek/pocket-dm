@@ -66,11 +66,11 @@ const CampaignSelector: FC = () => {
             >
               <div className="relative">
                 {/* Placeholder image */}
-                <img
-                  src={`/api/placeholder/800/400`}
+                {/* <img
+                  src=""
                   alt={campaign.title}
                   className="w-full h-48 object-cover"
-                />
+                /> */}
                 {/* Difficulty badge */}
                 <div className="absolute top-4 right-4 bg-mystic-900/90 px-3 py-1 rounded-full border border-gold-500/30">
                   <span className="text-sm text-mystic-200">{campaign.difficulty}</span>
